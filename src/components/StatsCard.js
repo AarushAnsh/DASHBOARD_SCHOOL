@@ -1,27 +1,53 @@
 import React from "react";
 
-const StatsCard = ({ data }) => {
-  if (!data.length) {
+const StatsCard = ({ data, type, statusField }) => {
+  if (!data || data.length === 0) {
     return (
       <div style={styles.card}>
-        <h3 style={styles.heading}>📚 Lecture Summary</h3>
+        <h3 style={styles.heading}>
+          {type === "Test" ? "📝 Test Summary" : "📚 Lecture Summary"}
+        </h3>
         <p style={styles.empty}>No data available for selected filters.</p>
       </div>
     );
   }
 
-  const statusValues = data.map(d =>
-    d["Completion Status"]?.toString().trim().toLowerCase()
-  );
+  // Get all possible status values
+  const statusValues = data.map(d => {
+    const value = d[statusField]?.toString().trim().toLowerCase();
+    console.log(`Status value for ${statusField}:`, value);
+    return value;
+  });
 
-  const total = statusValues.filter(v => v === "true" || v === "false").length;
-  const completed = statusValues.filter(v => v === "true").length;
-  const remaining = statusValues.filter(v => v === "false").length;
+  // Count different status values
+  const total = data.length;
+  const completed = statusValues.filter(v => 
+    v === "true" || 
+    v === "conducted" || 
+    v === "completed" || 
+    v === "yes"
+  ).length;
+  const remaining = statusValues.filter(v => 
+    v === "false" || 
+    v === "not conducted" || 
+    v === "pending" || 
+    v === "no"
+  ).length;
   const completionRate = total > 0 ? ((completed / total) * 100).toFixed(1) : 0;
+
+  console.log(`Stats for ${type}:`, {
+    total,
+    completed,
+    remaining,
+    completionRate,
+    statusValues
+  });
 
   return (
     <div style={styles.card}>
-      <h3 style={styles.heading}>📚 Lecture Summary</h3>
+      <h3 style={styles.heading}>
+        {type === "Test" ? "📝 Test Summary" : "📚 Lecture Summary"}
+      </h3>
       <div style={styles.statsRow}>
         <div style={{ ...styles.statBox, backgroundColor: "#e0f7fa" }}>
           <p style={styles.label}>Total</p>
